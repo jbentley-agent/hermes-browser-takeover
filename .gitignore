@@ -1,0 +1,5 @@
+node_modules/
+host/browser-takeover/node_modules/
+host/browser-takeover/vendor/noVNC/
+.DS_Store
+*.log

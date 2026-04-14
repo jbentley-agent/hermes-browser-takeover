@@ -1,0 +1,12 @@
+mcp_servers:
+  browser_takeover:
+    command: /root/.hermes/hermes-agent/venv/bin/python
+    args:
+      - /root/.hermes/bin/browser_takeover_mcp.py
+    env:
+      TAKEOVER_AGENT: agent
+      TAKEOVER_MINT_URL: http://host.docker.internal:9388/api/mint
+      TAKEOVER_DEFAULT_TTL: '900'
+      CAMOFOX_URL: http://127.0.0.1:9377
+    connect_timeout: 15
+    timeout: 30

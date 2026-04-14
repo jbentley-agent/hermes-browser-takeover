@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.hermes.browser-takeover-helper</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/ABSOLUTE/PATH/TO/node</string>
+    <string>/ABSOLUTE/PATH/TO/repo/host/browser-takeover/server.js</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>/ABSOLUTE/PATH/TO/repo/host/browser-takeover</string>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key>
+    <string>/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>PORT</key>
+    <string>9388</string>
+    <key>HOST</key>
+    <string>0.0.0.0</string>
+    <key>PUBLIC_BASE_URL</key>
+    <string>https://takeover.example.com</string>
+    <key>DEFAULT_AGENT_NAME</key>
+    <string>agent</string>
+    <key>TAKEOVER_AGENTS_JSON</key>
+    <string>{"agent":{"containerName":"agent-container","vncPort":5901,"camoufoxUrl":"http://127.0.0.1:9377"}}</string>
+    <key>DEFAULT_TTL_SECONDS</key>
+    <string>900</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/tmp/browser-takeover-helper.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/browser-takeover-helper.log</string>
+</dict>
+</plist>
