@@ -146,7 +146,7 @@ Do these in order:
 Example:
 
 ```bash
-git clone https://github.com/YOUR_ORG_OR_USER/hermes-browser-takeover.git
+git clone https://github.com/jbentley-agent/hermes-browser-takeover.git
 cd hermes-browser-takeover
 ```
 

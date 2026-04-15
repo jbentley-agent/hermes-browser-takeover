@@ -1,0 +1,76 @@
+diff --git a/tests/tools/test_browser_camofox_persistence.py b/tests/tools/test_browser_camofox_persistence.py
+index c95b640a..6e0faf30 100644
+--- a/tests/tools/test_browser_camofox_persistence.py
++++ b/tests/tools/test_browser_camofox_persistence.py
+@@ -95,6 +95,29 @@ class TestEphemeralMode:
+         s2 = _get_session("task-1")
+         assert s1 is s2
+ 
++    def test_auto_reattach_uses_existing_server_tab(self, tmp_path, monkeypatch):
++        monkeypatch.setenv("HERMES_HOME", str(tmp_path))
++        monkeypatch.setenv("CAMOFOX_URL", "http://localhost:9377")
++
++        tab_list_resp = _mock_response(
++            json_data={
++                "running": True,
++                "tabs": [
++                    {
++                        "tabId": "tab-existing",
++                        "url": "https://example.com/session",
++                    }
++                ],
++            }
++        )
++
++        with patch("tools.browser_camofox.requests.get", return_value=tab_list_resp) as mock_get:
++            session = _get_session("task-1")
++
++        assert session["tab_id"] == "tab-existing"
++        mock_get.assert_called_once()
++        assert mock_get.call_args.kwargs["params"]["userId"] == session["user_id"]
++
+ 
+ class TestManagedPersistenceMode:
+     """With managed_persistence: stable userId derived from Hermes profile."""
+diff --git a/tools/browser_camofox.py b/tools/browser_camofox.py
+index fbd1c962..6edddc31 100644
+--- a/tools/browser_camofox.py
++++ b/tools/browser_camofox.py
+@@ -142,7 +142,36 @@ def _get_session(task_id: Optional[str]) -> Dict[str, Any]:
+                 "managed": False,
+             }
+         _sessions[task_id] = session
+-        return session
++
++    # Auto-reattach: if local tab state is missing, probe the backend for an
++    # existing live tab before declaring the session gone. This covers cases
++    # where Python-side bookkeeping was cleaned up but the Camofox backend is
++    # still holding the browser/tab open. Without this, snapshot/click would
++    # fail with "No browser session" even though the backend can still serve
++    # the live page.
++    session = _sessions[task_id]
++    if not session["tab_id"]:
++        try:
++            base = get_camofox_url()
++            resp = requests.get(
++                f"{base}/tabs",
++                params={"userId": session["user_id"]},
++                timeout=5,
++            )
++            if resp.status_code == 200:
++                tabs = resp.json().get("tabs", [])
++                if tabs:
++                    reused_tab = tabs[-1]
++                    session["tab_id"] = reused_tab.get("tabId") or reused_tab.get("targetId")
++                    logger.info(
++                        "Auto-reattached to existing tab %s (url: %s)",
++                        session["tab_id"],
++                        reused_tab.get("url", "?"),
++                    )
++        except Exception as exc:
++            logger.debug("Auto-reattach check failed: %s", exc)
++
++    return session
+ 
+ 
+ def _ensure_tab(task_id: Optional[str], url: str = "about:blank") -> Dict[str, Any]:
