@@ -3,5 +3,8 @@
   "private": true,
   "version": "0.1.0",
   "description": "Container-side shared-session Camoufox takeover launcher for Hermes agents",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@askjo/camoufox-browser": "1.0.12"
+  }
 }

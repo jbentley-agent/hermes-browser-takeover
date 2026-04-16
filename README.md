@@ -54,6 +54,8 @@ Without the patch, the human may still control the correct browser visually, but
   - required Hermes patch
 - `examples/`
   - copy-pasteable environment and config examples
+- `scripts/install-agent-browser-takeover.sh`
+  - one-command installer for adding the MCP takeover stack to a Dockerized Hermes agent
 
 ## Architecture
 
@@ -131,6 +133,32 @@ The agent container must have:
 - optionally the CapSolver Firefox addon directory
 
 ## Install overview
+
+Fast path:
+- use `scripts/install-agent-browser-takeover.sh` from the Docker host to install the MCP takeover stack into a target agent container and render a matching host helper plist/env file
+
+Example:
+
+```bash
+./scripts/install-agent-browser-takeover.sh \
+  --container jordan-agent \
+  --agent jordan-agent \
+  --public-base-url http://192.168.40.101:9388
+```
+
+What the installer does:
+- installs host helper deps in this repo clone
+- fetches noVNC into `host/browser-takeover/vendor/noVNC`
+- copies the container runtime into the target container
+- installs container packages + npm deps
+- applies the Hermes reattach patch if needed
+- updates container `.env`, `config.yaml`, and `entrypoint.sh`
+- renders host helper files under `host/generated/`
+- starts the in-container takeover stack once for immediate health verification
+
+It intentionally does NOT restart or destroy the target container.
+
+Manual path:
 
 Do these in order:
 1. clone this repo onto the Docker host
