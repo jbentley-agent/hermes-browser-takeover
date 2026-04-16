@@ -1,8 +1,10 @@
 # Hermes Browser Takeover
 
-Human takeover for Hermes browser sessions running in Docker.
+MCP-based human takeover for Hermes browser sessions running in Docker.
 
 This repo lets a human temporarily control the exact live browser session that a Hermes agent is using through the native Camoufox browser backend, then hand control back to the agent in the same real tab.
+
+This repository packages the working MCP-based stack: host helper, container runtime, MCP minting tool, patch, and examples needed to add takeover to another agent.
 
 It includes:
 - a host-side noVNC takeover helper that mints temporary links
